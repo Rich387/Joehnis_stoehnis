@@ -23,7 +23,7 @@ How to install
 Open PowerShell and run:
 
 ```powershell
-git clone <>
+git clone <https://github.com/Rich387/Joehnis_stoehnis.git>
 cd Joehnis nis_sthönis
 ```
 
