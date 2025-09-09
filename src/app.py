@@ -12,34 +12,16 @@ from flask import (
     flash,
     make_response,
     request,
-    send_from_directory,
 )
 from pathlib import Path
 import time
 import os
-import argparse
-
 import logging
-
+import argparse
 base_dir = Path(__file__).parent
 templates_dir = base_dir / "templates"
 static_dir = base_dir / "static"
 static_dir.mkdir(parents=True, exist_ok=True)
-
-# Move audio files from templates -> static on first run so assets live in a
-# proper place. This is best-effort and only moves files if they exist in
-# templates and not already in static.
-try:
-    import shutil
-
-    for fn in ("seufzer.mp3", "stöhner.mp3", "sad_sound.mp3"):
-        srcf = templates_dir / fn
-        dstf = static_dir / fn
-        if srcf.exists() and not dstf.exists():
-            shutil.move(str(srcf), str(dstf))
-except Exception:
-    # don't crash the app if file operations fail
-    pass
 
 # Configure Flask to serve from the new static folder
 app = Flask(
@@ -138,12 +120,6 @@ def stoehn_decrement():
     last_stoehn_time = time.time()
     resp = make_response(redirect(url_for('index')))
     return set_animation_cookie(resp, "stoehn_minus")
-
-
-@app.route('/sounds/<filename>')
-def sounds(filename):
-    static_dir = base_dir / 'static'
-    return send_from_directory(str(static_dir), filename)
 
 
 if __name__ == "__main__":
