@@ -10,10 +10,6 @@ Repository layout
 - `src/counter.py` - Counter mechanics (thread-safe, file-persisted).
 - `src/templates/index.html` - Minimal HTML+JS UI.
 - `requirements.txt` - Python dependencies.
-- `.gitignore`
-
-- `app.py` — web server and routing (glue code).
-- `counter.py` — counter logic, persistence.
 - `templates/` and `static/` — HTML, CSS, JS UI assets.
 
 
