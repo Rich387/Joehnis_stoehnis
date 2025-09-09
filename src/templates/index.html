@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Jönis Stöhnis</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+        .counter-title { font-size: 32px; margin: 30px 0 10px 0; }
+        .counter-value { font-size: 48px; margin: 10px; }
+        .button-row { display: flex; justify-content: center; gap: 20px; margin-bottom: 30px; }
+        button { font-size: 24px; padding: 10px 30px; }
+        .message { color: red; font-size: 20px; margin: 20px; }
+    </style>
+</head>
+<body data-seufz-disabled="{{ '1' if seufz_disabled else '0' }}" data-stoehn-disabled="{{ '1' if stoehn_disabled else '0' }}" data-cooldown-ms="{{ cooldown_seconds * 1000 }}">
+    <h1>Jönis Stöhnis</h1>
+    <div id="emoji-animation" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:9999;display:none;font-size:80px;"></div>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="message">{{ messages[0] }}</div>
+      {% endif %}
+    {% endwith %}
+
+    <div class="counter-title">Seufz Counter</div>
+    <div class="counter-value">{{ seufz_count }}</div>
+    <div class="button-row">
+        <form method="POST" action="{{ url_for('seufz_increment') }}" style="display:inline;">
+            <button type="submit" {% if seufz_disabled %}disabled{% endif %}>+1</button>
+        </form>
+        <form method="POST" action="{{ url_for('seufz_decrement') }}" style="display:inline;">
+            <button type="submit" {% if seufz_disabled %}disabled{% endif %}>-1</button>
+        </form>
+    </div>
+
+    <div class="counter-title">Stöhn Counter</div>
+    <div class="counter-value">{{ stoehn_count }}</div>
+    <div class="button-row">
+        <form method="POST" action="{{ url_for('stoehn_increment') }}" style="display:inline;">
+            <button type="submit" {% if stoehn_disabled %}disabled{% endif %}>+1</button>
+        </form>
+        <form method="POST" action="{{ url_for('stoehn_decrement') }}" style="display:inline;">
+            <button type="submit" {% if stoehn_disabled %}disabled{% endif %}>-1</button>
+        </form>
+    </div>
+
+  <audio id="seufz-audio" src="{{ url_for('static', filename='seufzer.mp3') }}"></audio>
+  <audio id="stoehn-audio" src="{{ url_for('static', filename='stöhner.mp3') }}"></audio>
+  <audio id="sad-audio" src="{{ url_for('static', filename='sad_sound.mp3') }}"></audio>
+
+    <script>
+      // read server-provided flags from data-attributes on <body>
+      const __seufz_disabled = document.body.dataset.seufzDisabled === '1';
+      const __stoehn_disabled = document.body.dataset.stoehnDisabled === '1';
+      const __cooldown_ms = parseInt(document.body.dataset.cooldownMs || '3000', 10);
+      console.log("page rendered:", { seufz_disabled: __seufz_disabled, stoehn_disabled: __stoehn_disabled, cooldown_ms: __cooldown_ms });
+
+      function playSound(id) {
+        var audio = document.getElementById(id);
+        if (audio) {
+          audio.currentTime = 0;
+          audio.play();
+        }
+      }
+
+      function showEmoji(emoji, sound) {
+        var anim = document.getElementById('emoji-animation');
+        anim.innerText = emoji;
+        anim.style.display = 'block';
+        anim.style.opacity = 1;
+        anim.style.transition = 'none';
+        anim.style.transform = 'translate(-50%,-50%) scale(1)';
+        if (sound) playSound(sound);
+        setTimeout(function() {
+          anim.style.transition = 'opacity 1s, transform 1s';
+          anim.style.opacity = 0;
+          anim.style.transform = 'translate(-50%,-70%) scale(1.5)';
+        }, 100);
+        setTimeout(function() {
+          anim.style.display = 'none';
+        }, 1100);
+      }
+
+      function getCookie(name) {
+        let value = "; " + document.cookie;
+        let parts = value.split("; " + name + "=");
+        if (parts.length === 2) return parts.pop().split(";").shift();
+      }
+      let anim = getCookie("animation");
+      if (anim) {
+        if (anim === "seufz_plus") showEmoji("😮‍💨", "seufz-audio");
+        if (anim === "seufz_minus") showEmoji("😔", "sad-audio");
+        if (anim === "stoehn_plus") showEmoji("😫", "stoehn-audio");
+        if (anim === "stoehn_minus") showEmoji("😔", "sad-audio");
+        document.cookie = "animation=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      }
+
+      // Reload after cooldown (use small buffer so reload happens after server cooldown)
+      const __seufz_reload_needed = __seufz_disabled || __stoehn_disabled;
+      const __seufz_cooldown_ms = __cooldown_ms;
+      console.log("reload_needed:", __seufz_reload_needed, "cooldown_ms:", __seufz_cooldown_ms);
+      if (__seufz_reload_needed) {
+        setTimeout(function() {
+          console.log("triggering reload");
+          // force reload of the current page (preserve query if any)
+          window.location.href = window.location.pathname + window.location.search;
+        }, __seufz_cooldown_ms + 200);
+      }
+    </script>
+</body>
+</html>
