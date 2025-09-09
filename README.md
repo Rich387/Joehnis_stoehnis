@@ -20,18 +20,20 @@ Open PowerShell and run:
 
 ```powershell
 git clone <https://github.com/Rich387/Joehnis_stoehnis.git>
-cd Joehnis nis_sthönis
 ```
 
-Install requirements when working with anaconda create new env
+
+Install requirements. When working with anaconda (miniconda) create new python env and install requirements.
+When using minconda you can run all the commands in the anaconda comand prompt (execute with the specific enviroment)
 
 ```powershell
 
 pip install -r requirements.txt
 ```
 
-Run locally
-
+Run locally:
+Navigate to the repository folder and run src.app (entry point)
+ 
 ```powershell
 cd Joehnis_stoehnis
 
@@ -43,8 +45,7 @@ The server listens on port 5000 by default. Open `http://localhost:5000` in your
 Accessing from another device on your local network
 
 1. Make sure the host machine allows incoming connections on port 5000 (check firewall).
-2. Run the app bound to all interfaces (0.0.0.0). The example `app.py` in this repo already binds 0.0.0.0 when run directly.
-3. Find the host machine IP (Windows PowerShell):
+2. Find the host machine IP (Windows PowerShell):
 
 ```powershell
 ipconfig | Select-String "IPv4" -Context 0,0
